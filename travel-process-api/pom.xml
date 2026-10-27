@@ -31,18 +31,18 @@
 				<version>${mule.maven.plugin.version}</version>
 				<extensions>true</extensions>
 				<configuration>
-					<cloudhubDeployment>
+					<cloudhub2Deployment>
 						<uri>https://anypoint.mulesoft.com</uri>
 						<muleVersion>${app.runtime}</muleVersion>
 						<username>${env.ANYPOINT_USERNAME}</username>
 						<password>${env.ANYPOINT_PASSWORD}</password>
 						<applicationName>travel-agency-process-api</applicationName>
 						<environment>Sandbox</environment>
-						<region>us-east-1</region>
-						<workers>1</workers>
-						<workerType>MICRO</workerType>
+						<target>Shared Space</target>
+						<vCores>0.1</vCores>
+						<replicas>1</replicas>
 						<skipDeploymentVerification>true</skipDeploymentVerification>
-					</cloudhubDeployment>
+					</cloudhub2Deployment>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -105,21 +105,6 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
-	<distributionManagement>
-		<repository>
-			<id>anypoint-exchange-v3</id>
-			<name>Anypoint Exchange</name>
-			<url>https://maven.anypoint.mulesoft.com/api/v3/organizations/2b624f3c-bc06-4d04-90ef-48200b112b5d/maven</url>
-			<layout>default</layout>
-		</repository>
-		<snapshotRepository>
-			<id>anypoint-exchange-v3</id>
-			<name>Anypoint Exchange</name>
-			<url>https://maven.anypoint.mulesoft.com/api/v3/organizations/2b624f3c-bc06-4d04-90ef-48200b112b5d/maven</url>
-			<layout>default</layout>
-		</snapshotRepository>
-	</distributionManagement>
 
 	<repositories>
 		<repository>
