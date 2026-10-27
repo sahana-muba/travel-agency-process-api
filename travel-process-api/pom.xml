@@ -42,7 +42,7 @@
                         <password>${env.ANYPOINT_PASSWORD}</password>
                         <applicationName>travel-agency-process-api</applicationName>
                         <environment>Sandbox</environment>
-                        <target>Shared Space</target>
+                        <target>Cloudhub-US-East-2</target>
                         <vCores>0.1</vCores>
                         <replicas>1</replicas>
                         <skipDeploymentVerification>true</skipDeploymentVerification>
