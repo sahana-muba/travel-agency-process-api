@@ -21,7 +21,6 @@
 
     <build>
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-clean-plugin</artifactId>
@@ -73,12 +72,10 @@
                     </coverage>
                 </configuration>
             </plugin>
-
         </plugins>
     </build>
 
     <dependencies>
-
         <dependency>
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-http-connector</artifactId>
@@ -115,11 +112,9 @@
             <version>1.2.1</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <repositories>
-
         <repository>
             <id>anypoint-exchange-v3</id>
             <name>Anypoint Exchange</name>
@@ -133,11 +128,9 @@
             <url>https://repository.mulesoft.org/nexus/repository/releases/</url>
             <layout>default</layout>
         </repository>
-
     </repositories>
 
     <pluginRepositories>
-
         <pluginRepository>
             <id>mulesoft-releases</id>
             <name>MuleSoft Releases Repository</name>
@@ -153,7 +146,15 @@
             <name>MuleSoft Public Repository</name>
             <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
         </pluginRepository>
-
     </pluginRepositories>
+
+    <distributionManagement>
+        <repository>
+            <id>Repository</id>
+            <name>Anypoint Exchange</name>
+            <url>https://maven.anypoint.mulesoft.com/api/v3/organizations/2b624f3c-bc06-4d04-90ef-48200b112b5d/maven</url>
+            <layout>default</layout>
+        </repository>
+    </distributionManagement>
 
 </project>
