@@ -9,7 +9,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 		<http:listener-connection host="0.0.0.0" port="8081" />
 	</http:listener-config>
 	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="daf97b57-2e23-430f-8bd0-931a2c355578" >
-		<http:request-connection host="localhost" port="8082" />
+		<http:request-connection host="travel-country-system-api-h7k5uk.5sc6y6-1.usa-e2.cloudhub.io" port="443" protocol="HTTPS"/>
 	</http:request-config>
 	<http:request-config name="HTTP_Request_configuration1" doc:name="HTTP Request configuration" doc:id="a234ffbf-83b4-4d2a-9659-79fc8403a949" >
 		<http:request-connection host="localhost" port="8083" />
