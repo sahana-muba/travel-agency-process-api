@@ -7,7 +7,7 @@
 
     <groupId>2b624f3c-bc06-4d04-90ef-48200b112b5d</groupId>
     <artifactId>travel-process-api</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>mule-application</packaging>
     <name>travel-process-api</name>
 
