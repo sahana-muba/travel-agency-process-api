@@ -1,55 +1,139 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="e38910fb-3239-418e-bc5c-40e5dfa2eb3c" >
-		<http:listener-connection host="0.0.0.0" port="8081" />
-	</http:listener-config>
-	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="daf97b57-2e23-430f-8bd0-931a2c355578" >
-		<http:request-connection host="travel-country-system-api-h7k5uk.5sc6y6-1.usa-e2.cloudhub.io" port="443" protocol="HTTPS"/>
-	</http:request-config>
-	<http:request-config name="HTTP_Request_configuration1" doc:name="HTTP Request configuration" doc:id="a234ffbf-83b4-4d2a-9659-79fc8403a949" >
-		<http:request-connection host="localhost" port="8083" />
-	</http:request-config>
-	<http:request-config name="HTTP_Request_configuration2" doc:name="HTTP Request configuration" doc:id="8a029014-0350-4d28-a25c-c1f0d202e732" >
-		<http:request-connection host="localhost" port="8084" />
-	</http:request-config>
-	<flow name="travel-process-apiFlow" doc:id="b313d57a-4f71-4ae4-a9b4-b15116e72a6e" >
-		
-<http:listener doc:name="Travel Process Listener"
-               config-ref="HTTP_Listener_config"
-               path="/travel/{country}">
-    <http:response statusCode="200"/>
-    <http:error-response statusCode="#[if (error.errorType.namespace == 'APP' and error.errorType.identifier == 'INVALID_COUNTRY') 404 else 502]">
-        <http:body><![CDATA[#[payload]]]></http:body>
-    </http:error-response>
-</http:listener>
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+      http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+      http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 
-		<logger level="INFO" doc:name="Log Country Request" doc:id="612c4e8f-d404-4459-a7c2-46905d4dbb23" message="#[attributes.uriParams.country]"/>
-		<try doc:name="Try" doc:id="fd900a9f-fedf-4174-80c7-f28bca017301" >
-			<http:request method="GET" doc:name="country request" doc:id="e8f959a7-a5c7-4a7e-8bc1-775aa9890f65" config-ref="HTTP_Request_configuration" path="#['/countries/' ++ attributes.uriParams.country]" />
-			<set-variable value="#[payload]" doc:name="Save Country Data" doc:id="1e28f0ab-1e87-4782-84f5-59ddb74363fe" variableName="countryData" />
-			<choice doc:name="Choice" doc:id="60867297-a823-4a3a-b601-a9e6a70a6d1b" >
-				<when expression='#[isEmpty(vars.countryData.countryName default "")]'>
-					<raise-error doc:name="Raise error" doc:id="24e9a674-e51b-4a7d-98d3-8fd16e547565" type="APP:INVALID_COUNTRY" description="Country not found. Please provide a valid country name."/>
-				</when>
-			</choice>
-			<http:request method="GET" doc:name="weather request" doc:id="722e2633-c831-4054-80fd-190abb46aec0" config-ref="HTTP_Request_configuration1" path="#[('/weather/' ++ (vars.countryData.countryName as String))]" />
-			<set-variable value="#[payload]" doc:name="Save Weather Data" doc:id="87e2d4b9-26e7-4c63-9792-4edb5fda40d2" variableName="weatherData" />
-			<http:request method="GET" doc:name="exchangeRate Data" doc:id="37197f4e-c173-40ac-b8d1-21a44f8018e8" config-ref="HTTP_Request_configuration2" path="#['/exchange/' ++ vars.countryData.currencyCode]" />
-			<set-payload value="#[output application/json&#10;---&#10;{&#10;    countryInformation: vars.countryData,&#10;    weatherInformation: vars.weatherData,&#10;    currencyInformation: payload&#10;}]" doc:name="Set Payload" doc:id="c4cc6a68-3e1c-4102-a9d4-3efaeb82ca97" mimeType="application/json" />
-			
+    <!-- Process API Listener -->
+    <http:listener-config name="HTTP_Listener_config"
+                          doc:name="HTTP Listener config"
+                          doc:id="e38910fb-3239-418e-bc5c-40e5dfa2eb3c">
+        <http:listener-connection host="0.0.0.0" port="${http.port}"/>
+    </http:listener-config>
 
-<error-handler>
-    <on-error-continue type="ANY"
-        logException="true"
-        enableNotifications="true"
-        doc:name="General Error Handler">
-        <set-payload
-            value='#[output application/json
+    <!-- Country System API -->
+    <http:request-config name="HTTP_Request_configuration"
+                         doc:name="HTTP Request configuration"
+                         doc:id="daf97b57-2e23-430f-8bd0-931a2c355578">
+        <http:request-connection
+            host="travel-country-system-api-h7k5uk.5sc6y6-1.usa-e2.cloudhub.io"
+            port="443"
+            protocol="HTTPS"/>
+    </http:request-config>
+
+    <!-- Weather System API -->
+    <http:request-config name="HTTP_Request_configuration1"
+                         doc:name="HTTP Request configuration"
+                         doc:id="a234ffbf-83b4-4d2a-9659-79fc8403a949">
+        <http:request-connection
+            host="travel-weather-system-api-h7k5uk.5sc6y6-3.usa-e2.cloudhub.io"
+            port="443"
+            protocol="HTTPS"/>
+    </http:request-config>
+
+    <!-- Exchange System API -->
+    <http:request-config name="HTTP_Request_configuration2"
+                         doc:name="HTTP Request configuration"
+                         doc:id="8a029014-0350-4d28-a25c-c1f0d202e732">
+        <http:request-connection
+            host="travel-exchange-system-api-h7k5uk.5sc6y6-4.usa-e2.cloudhub.io"
+            port="443"
+            protocol="HTTPS"/>
+    </http:request-config>
+
+    <flow name="travel-process-apiFlow"
+          doc:id="b313d57a-4f71-4ae4-a9b4-b15116e72a6e">
+
+        <http:listener doc:name="Travel Process Listener"
+                       config-ref="HTTP_Listener_config"
+                       path="/travel/{country}">
+
+            <http:response statusCode="200"/>
+
+            <http:error-response statusCode="#[if (error.errorType.namespace == 'APP' and error.errorType.identifier == 'INVALID_COUNTRY') 404 else 502]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+            </http:error-response>
+
+        </http:listener>
+
+        <logger level="INFO"
+                doc:name="Log Country Request"
+                doc:id="612c4e8f-d404-4459-a7c2-46905d4dbb23"
+                message="#[attributes.uriParams.country]"/>
+
+        <try doc:name="Try"
+             doc:id="fd900a9f-fedf-4174-80c7-f28bca017301">
+
+            <!-- Request Country Information -->
+            <http:request method="GET"
+                          doc:name="country request"
+                          doc:id="e8f959a7-a5c7-4a7e-8bc1-775aa9890f65"
+                          config-ref="HTTP_Request_configuration"
+                          path="#['/countries/' ++ attributes.uriParams.country]"/>
+
+            <set-variable value="#[payload]"
+                          doc:name="Save Country Data"
+                          doc:id="1e28f0ab-1e87-4782-84f5-59ddb74363fe"
+                          variableName="countryData"/>
+
+            <choice doc:name="Choice"
+                    doc:id="60867297-a823-4a3a-b601-a9e6a70a6d1b">
+
+                <when expression="#[isEmpty(vars.countryData.countryName default '')]">
+                    <raise-error doc:name="Raise error"
+                                 doc:id="24e9a674-e51b-4a7d-98d3-8fd16e547565"
+                                 type="APP:INVALID_COUNTRY"
+                                 description="Country not found. Please provide a valid country name."/>
+                </when>
+
+            </choice>
+
+            <!-- Request Weather Information -->
+            <http:request method="GET"
+                          doc:name="weather request"
+                          doc:id="722e2633-c831-4054-80fd-190abb46aec0"
+                          config-ref="HTTP_Request_configuration1"
+                          path="#[('/weather/' ++ (vars.countryData.countryName as String))]"/>
+
+            <set-variable value="#[payload]"
+                          doc:name="Save Weather Data"
+                          doc:id="87e2d4b9-26e7-4c63-9792-4edb5fda40d2"
+                          variableName="weatherData"/>
+
+            <!-- Request Exchange Rate Information -->
+            <http:request method="GET"
+                          doc:name="exchangeRate Data"
+                          doc:id="37197f4e-c173-40ac-b8d1-21a44f8018e8"
+                          config-ref="HTTP_Request_configuration2"
+                          path="#['/exchange/' ++ vars.countryData.currencyCode]"/>
+
+            <!-- Combine All API Responses -->
+            <set-payload value="#[output application/json
+---
+{
+    countryInformation: vars.countryData,
+    weatherInformation: vars.weatherData,
+    currencyInformation: payload
+}]"
+                         doc:name="Set Payload"
+                         doc:id="c4cc6a68-3e1c-4102-a9d4-3efaeb82ca97"
+                         mimeType="application/json"/>
+
+            <!-- Error Handling -->
+            <error-handler>
+
+                <on-error-continue type="ANY"
+                                   logException="true"
+                                   enableNotifications="true"
+                                   doc:name="General Error Handler">
+
+                    <set-payload value='#[output application/json
 ---
 if (error.errorType.namespace == "APP" and error.errorType.identifier == "INVALID_COUNTRY")
 {
@@ -61,11 +145,14 @@ else
     error: "Travel information service failed",
     message: "Unable to retrieve the requested travel information."
 }]'
-            mimeType="application/json"/>
-    </on-error-continue>
-</error-handler>
+                                 mimeType="application/json"/>
 
+                </on-error-continue>
 
-		</try>
-	</flow>
+            </error-handler>
+
+        </try>
+
+    </flow>
+
 </mule>
