@@ -1,49 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
       xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
       xsi:schemaLocation="
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
         http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
         http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+
+    <!-- Provide the HTTP port property required by the test runtime -->
+    <global-property name="http.port" value="8081"/>
 
     <munit:config name="travel-process-api-test-suite"/>
 
     <!-- TEST 1: Valid country -->
     <munit:test name="test-valid-country-japan">
         <munit:behavior>
-            <munit:set-event>
-                <munit:payload value="#[{}]"/>
-                <munit:attributes value="#[{uriParams: {country: 'Japan'}}]"/>
-            </munit:set-event>
-
             <munit-tools:mock-when processor="http:request">
                 <munit-tools:with-attributes>
-                    <munit-tools:with-attribute
-                        attributeName="method"
-                        whereValue="#['GET']"/>
+                    <munit-tools:with-attribute attributeName="config-ref"
+                                                whereValue="#['HTTP_Request_configuration']"/>
                 </munit-tools:with-attributes>
                 <munit-tools:then-return>
                     <munit-tools:payload
-                        value='#[output application/json
-                        ---
-                        {
-                            countryName: "Japan",
-                            capitalCity: "Tokyo",
-                            region: "Asia",
-                            population: 125000000,
-                            officialCurrency: "Japanese yen",
-                            currencyCode: "JPY",
-                            flagUrl: "https://example.com/japan.png"
-                        }]'
+                        value="#[output application/json --- {countryName: 'Japan', capitalCity: 'Tokyo', region: 'Asia', population: 125000000, officialCurrency: 'Japanese yen', currencyCode: 'JPY', flagUrl: 'https://example.com/japan.png'}]"
+                        mediaType="application/json"/>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
+
+            <munit-tools:mock-when processor="http:request">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="config-ref"
+                                                whereValue="#['HTTP_Request_configuration1']"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-return>
+                    <munit-tools:payload
+                        value="#[output application/json --- {currentTemperature: 20, weatherCondition: 'Clear', humidity: 50, windSpeed: 3}]"
+                        mediaType="application/json"/>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
+
+            <munit-tools:mock-when processor="http:request">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="config-ref"
+                                                whereValue="#['HTTP_Request_configuration2']"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-return>
+                    <munit-tools:payload
+                        value="#[output application/json --- {currencyCode: 'JPY', exchangeRate: 150.0}]"
                         mediaType="application/json"/>
                 </munit-tools:then-return>
             </munit-tools:mock-when>
         </munit:behavior>
 
         <munit:execution>
+            <munit:set-event>
+                <munit:payload value="#[{}]"/>
+                <munit:attributes value="#[{uriParams: {country: 'Japan'}}]"/>
+            </munit:set-event>
             <flow-ref name="travel-process-apiFlow"/>
         </munit:execution>
 
@@ -57,74 +75,46 @@
     <!-- TEST 2: Invalid country -->
     <munit:test name="test-invalid-country">
         <munit:behavior>
-            <munit:set-event>
-                <munit:payload value="#[{}]"/>
-                <munit:attributes value="#[{uriParams: {country: 'InvalidCountry123'}}]"/>
-            </munit:set-event>
-
             <munit-tools:mock-when processor="http:request">
                 <munit-tools:with-attributes>
-                    <munit-tools:with-attribute
-                        attributeName="method"
-                        whereValue="#['GET']"/>
+                    <munit-tools:with-attribute attributeName="config-ref"
+                                                whereValue="#['HTTP_Request_configuration']"/>
                 </munit-tools:with-attributes>
                 <munit-tools:then-return>
                     <munit-tools:payload
-                        value='#[output application/json
-                        ---
-                        {
-                            countryName: null,
-                            capitalCity: null,
-                            region: null,
-                            population: null,
-                            officialCurrency: null,
-                            currencyCode: null,
-                            flagUrl: null
-                        }]'
+                        value="#[output application/json --- {countryName: null, capitalCity: null, region: null, population: null, officialCurrency: null, currencyCode: null, flagUrl: null}]"
                         mediaType="application/json"/>
                 </munit-tools:then-return>
             </munit-tools:mock-when>
         </munit:behavior>
 
         <munit:execution>
+            <munit:set-event>
+                <munit:payload value="#[{}]"/>
+                <munit:attributes value="#[{uriParams: {country: 'InvalidCountry123'}}]"/>
+            </munit:set-event>
             <flow-ref name="travel-process-apiFlow"/>
         </munit:execution>
 
-     
-<munit:validation>
-    <munit-tools:assert-that
-        expression="#[payload.error]"
-        is="#[MunitTools::equalTo('Country not found')]" />
-</munit:validation>
-       
+        <munit:validation>
+            <munit-tools:assert-that
+                expression="#[payload.error]"
+                is="#[MunitTools::equalTo('Country not found')]"/>
+        </munit:validation>
     </munit:test>
 
     <!-- TEST 3: Exchange API failure -->
     <munit:test name="test-exchange-api-failure">
         <munit:behavior>
-            <munit:set-event>
-                <munit:payload value="#[{}]"/>
-                <munit:attributes value="#[{uriParams: {country: 'Japan'}}]"/>
-            </munit:set-event>
-
             <!-- Mock country request -->
             <munit-tools:mock-when processor="http:request">
-                <munit-tools:with-attributes >
-					<munit-tools:with-attribute whereValue="e8f959a7-a5c7-4a7e-8bc1-775aa9890f65" attributeName="doc:id" />
-				</munit-tools:with-attributes>
-				<munit-tools:then-return>
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="config-ref"
+                                                whereValue="#['HTTP_Request_configuration']"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-return>
                     <munit-tools:payload
-                        value='#[output application/json
-                        ---
-                        {
-                            countryName: "Japan",
-                            capitalCity: "Tokyo",
-                            region: "Asia",
-                            population: 125000000,
-                            officialCurrency: "Japanese yen",
-                            currencyCode: "JPY",
-                            flagUrl: "https://example.com/japan.png"
-                        }]'
+                        value="#[output application/json --- {countryName: 'Japan', capitalCity: 'Tokyo', region: 'Asia', population: 125000000, officialCurrency: 'Japanese yen', currencyCode: 'JPY', flagUrl: 'https://example.com/japan.png'}]"
                         mediaType="application/json"/>
                 </munit-tools:then-return>
             </munit-tools:mock-when>
@@ -132,39 +122,33 @@
             <!-- Mock weather request -->
             <munit-tools:mock-when processor="http:request">
                 <munit-tools:with-attributes>
-                    <munit-tools:with-attribute
-                        attributeName="doc:name"
-                        whereValue="#['weather request']"/>
+                    <munit-tools:with-attribute attributeName="config-ref"
+                                                whereValue="#['HTTP_Request_configuration1']"/>
                 </munit-tools:with-attributes>
                 <munit-tools:then-return>
                     <munit-tools:payload
-                        value='#[output application/json
-                        ---
-                        {
-                            currentTemperature: 20,
-                            weatherCondition: "Clear",
-                            humidity: 50,
-                            windSpeed: 3
-                        }]'
+                        value="#[output application/json --- {currentTemperature: 20, weatherCondition: 'Clear', humidity: 50, windSpeed: 3}]"
                         mediaType="application/json"/>
                 </munit-tools:then-return>
             </munit-tools:mock-when>
 
             <!-- Simulate Exchange API connectivity failure -->
             <munit-tools:mock-when processor="http:request">
-                <munit-tools:with-attributes >
-					<munit-tools:with-attribute whereValue="37197f4e-c173-40ac-b8d1-21a44f8018e8" attributeName="doc:id" />
-				</munit-tools:with-attributes>
-				
-<munit-tools:then-return>
-    <munit-tools:error typeId="HTTP:CONNECTIVITY" />
-</munit-tools:then-return>
-
-            
-</munit-tools:mock-when>
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="config-ref"
+                                                whereValue="#['HTTP_Request_configuration2']"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-return>
+                    <munit-tools:error typeId="HTTP:CONNECTIVITY"/>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
         </munit:behavior>
 
         <munit:execution>
+            <munit:set-event>
+                <munit:payload value="#[{}]"/>
+                <munit:attributes value="#[{uriParams: {country: 'Japan'}}]"/>
+            </munit:set-event>
             <flow-ref name="travel-process-apiFlow"/>
         </munit:execution>
 
