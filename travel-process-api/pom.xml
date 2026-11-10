@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -7,97 +6,48 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>2b624f3c-bc06-4d04-90ef-48200b112b5d</groupId>
-    <artifactId>travel-process-api</artifactId>
+    <artifactId>travel-process-api-v2</artifactId>
     <version>1.0.1</version>
     <packaging>mule-application</packaging>
-    <name>travel-process-api</name>
+    <name>travel-process-api-v2</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <app.runtime>4.9.0</app.runtime>
+        <releaseChannel>LTS</releaseChannel>
+        <javaVersion>17</javaVersion>
         <mule.maven.plugin.version>4.10.1</mule.maven.plugin.version>
         <munit.version>3.7.3</munit.version>
     </properties>
 
-    <build>
-        <plugins>
+    <distributionManagement>
+        <repository>
+            <id>anypoint-exchange-v3</id>
+            <name>Anypoint Exchange</name>
+            <url>https://maven.anypoint.mulesoft.com/api/v3/organizations/2b624f3c-bc06-4d04-90ef-48200b112b5d/maven</url>
+            <layout>default</layout>
+        </repository>
+    </distributionManagement>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-clean-plugin</artifactId>
-                <version>3.2.0</version>
-            </plugin>
+    <repositories>
+        <repository>
+            <id>anypoint-exchange-v3</id>
+            <name>Anypoint Exchange</name>
+            <url>https://maven.anypoint.mulesoft.com/api/v3/maven</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
 
-            <plugin>
-                <groupId>org.mule.tools.maven</groupId>
-                <artifactId>mule-maven-plugin</artifactId>
-                <version>${mule.maven.plugin.version}</version>
-                <extensions>true</extensions>
-
-                <configuration>
-                    <classifier>mule-application</classifier>
-
-                    <cloudhub2Deployment>
-                        <uri>https://anypoint.mulesoft.com</uri>
-                        <provider>MC</provider>
-
-                        <muleVersion>${app.runtime}</muleVersion>
-                        <releaseChannel>LTS</releaseChannel>
-                        <javaVersion>17</javaVersion>
-
-                        <username>${env.ANYPOINT_USERNAME}</username>
-                        <password>${env.ANYPOINT_PASSWORD}</password>
-
-                        <applicationName>travel-agency-process-api-v2</applicationName>
-
-                        <environment>Sandbox</environment>
-                        <target>Cloudhub-US-East-2</target>
-
-                        <vCores>0.1</vCores>
-                        <replicas>1</replicas>
-
-                        <skipDeploymentVerification>false</skipDeploymentVerification>
-                    </cloudhub2Deployment>
-
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>com.mulesoft.munit.tools</groupId>
-                <artifactId>munit-maven-plugin</artifactId>
-                <version>${munit.version}</version>
-
-                <executions>
-                    <execution>
-                        <id>test</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>test</goal>
-                            <goal>coverage-report</goal>
-                        </goals>
-                    </execution>
-                </executions>
-
-                <configuration>
-                    <dynamicPorts>
-                        <dynamicPort>http.port</dynamicPort>
-                    </dynamicPorts>
-
-                    <coverage>
-                        <runCoverage>true</runCoverage>
-                        <formats>
-                            <format>html</format>
-                        </formats>
-                    </coverage>
-                </configuration>
-            </plugin>
-
-        </plugins>
-    </build>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>anypoint-exchange-v3</id>
+            <name>Anypoint Exchange</name>
+            <url>https://maven.anypoint.mulesoft.com/api/v3/maven</url>
+            <layout>default</layout>
+        </pluginRepository>
+    </pluginRepositories>
 
     <dependencies>
-
         <dependency>
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-http-connector</artifactId>
@@ -129,58 +79,72 @@
         </dependency>
 
         <dependency>
-            <groupId>org.mule.weave</groupId>
-            <artifactId>assertions</artifactId>
+            <groupId>org.mule.munit</groupId>
+            <artifactId>munit-assert</artifactId>
             <version>1.2.1</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
-    <repositories>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.2.0</version>
+            </plugin>
 
-        <repository>
-            <id>anypoint-exchange-v3</id>
-            <name>Anypoint Exchange</name>
-            <url>https://maven.anypoint.mulesoft.com/api/v3/maven</url>
-            <layout>default</layout>
-        </repository>
+            <plugin>
+                <groupId>org.mule.tools.maven</groupId>
+                <artifactId>mule-maven-plugin</artifactId>
+                <version>${mule.maven.plugin.version}</version>
+                <extensions>true</extensions>
 
-        <repository>
-            <id>mulesoft-releases</id>
-            <name>MuleSoft Releases Repository</name>
-            <url>https://repository.mulesoft.org/nexus/repository/releases/</url>
-            <layout>default</layout>
-        </repository>
+                <configuration>
+                    <cloudhub2Deployment>
+                        <uri>https://anypoint.mulesoft.com</uri>
+                        <provider>MC</provider>
+                        <environment>Sandbox</environment>
+                        <target>Cloudhub-US-East-2</target>
 
-    </repositories>
+                        <applicationName>travel-agency-process-api-v2</applicationName>
 
-    <pluginRepositories>
+                        <replicas>1</replicas>
+                        <vCores>0.1</vCores>
 
-        <pluginRepository>
-            <id>mulesoft-releases</id>
-            <name>MuleSoft Releases Repository</name>
-            <url>https://repository.mulesoft.org/nexus/repository/releases/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
+                        <deploymentSettings>
+                            <runtimeVersion>${app.runtime}</runtimeVersion>
+                            <releaseChannel>${releaseChannel}</releaseChannel>
+                            <javaVersion>${javaVersion}</javaVersion>
+                        </deploymentSettings>
 
-        <pluginRepository>
-            <id>mulesoft-public</id>
-            <name>MuleSoft Public Repository</name>
-            <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
-        </pluginRepository>
+                        <properties>
+                            <property>
+                                <key>http.port</key>
+                                <value>8081</value>
+                            </property>
+                        </properties>
 
-    </pluginRepositories>
+                        <skipDeploymentVerification>false</skipDeploymentVerification>
+                    </cloudhub2Deployment>
+                </configuration>
+            </plugin>
 
-    <distributionManagement>
-        <repository>
-            <id>anypoint-exchange-v3</id>
-            <name>Anypoint Exchange</name>
-            <url>https://maven.anypoint.mulesoft.com/api/v3/organizations/2b624f3c-bc06-4d04-90ef-48200b112b5d/maven</url>
-            <layout>default</layout>
-        </repository>
-    </distributionManagement>
+            <plugin>
+                <groupId>com.mulesoft.munit.tools</groupId>
+                <artifactId>munit-maven-plugin</artifactId>
+                <version>${munit.version}</version>
+                <executions>
+                    <execution>
+                        <id>test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
