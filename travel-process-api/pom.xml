@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -22,7 +21,6 @@
 
     <build>
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-clean-plugin</artifactId>
@@ -34,10 +32,8 @@
                 <artifactId>mule-maven-plugin</artifactId>
                 <version>${mule.maven.plugin.version}</version>
                 <extensions>true</extensions>
-
                 <configuration>
                     <classifier>mule-application</classifier>
-
                     <cloudhub2Deployment>
                         <uri>https://anypoint.mulesoft.com</uri>
                         <provider>MC</provider>
@@ -58,7 +54,6 @@
                 <groupId>com.mulesoft.munit.tools</groupId>
                 <artifactId>munit-maven-plugin</artifactId>
                 <version>${munit.version}</version>
-
                 <executions>
                     <execution>
                         <id>test</id>
@@ -69,12 +64,10 @@
                         </goals>
                     </execution>
                 </executions>
-
                 <configuration>
                     <dynamicPorts>
                         <dynamicPort>http.port</dynamicPort>
                     </dynamicPorts>
-
                     <coverage>
                         <runCoverage>true</runCoverage>
                         <formats>
@@ -83,12 +76,10 @@
                     </coverage>
                 </configuration>
             </plugin>
-
         </plugins>
     </build>
 
     <dependencies>
-
         <dependency>
             <groupId>org.mule.connectors</groupId>
             <artifactId>mule-http-connector</artifactId>
@@ -125,11 +116,9 @@
             <version>1.2.1</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <repositories>
-
         <repository>
             <id>anypoint-exchange-v3</id>
             <name>Anypoint Exchange</name>
@@ -143,11 +132,9 @@
             <url>https://repository.mulesoft.org/nexus/repository/releases/</url>
             <layout>default</layout>
         </repository>
-
     </repositories>
 
     <pluginRepositories>
-
         <pluginRepository>
             <id>mulesoft-releases</id>
             <name>MuleSoft Releases Repository</name>
@@ -162,12 +149,11 @@
             <name>MuleSoft Public Repository</name>
             <url>https://repository.mulesoft.org/nexus/content/repositories/public/</url>
         </pluginRepository>
-
     </pluginRepositories>
 
     <distributionManagement>
         <repository>
-            <id>Repository</id>
+            <id>anypoint-exchange-v3</id>
             <name>Anypoint Exchange</name>
             <url>https://maven.anypoint.mulesoft.com/api/v3/organizations/2b624f3c-bc06-4d04-90ef-48200b112b5d/maven</url>
             <layout>default</layout>
