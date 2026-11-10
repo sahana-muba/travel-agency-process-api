@@ -77,13 +77,6 @@
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
         </dependency>
-
-        <dependency>
-            <groupId>org.mule.munit</groupId>
-            <artifactId>munit-assert</artifactId>
-            <version>1.2.1</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
@@ -106,9 +99,7 @@
                         <provider>MC</provider>
                         <environment>Sandbox</environment>
                         <target>Cloudhub-US-East-2</target>
-
                         <applicationName>travel-agency-process-api-v2</applicationName>
-
                         <replicas>1</replicas>
                         <vCores>0.1</vCores>
 
