@@ -5,7 +5,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>2b624f3c-bc06-4d04-90ef-48200b112b5d</groupId>
+    <groupId>49a5c82f-4354-4c4d-934f-9e50875ad682</groupId>
     <artifactId>travel-process-api-v2</artifactId>
     <version>1.0.1</version>
     <packaging>mule-application</packaging>
@@ -13,8 +13,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <app.runtime>4.9.0</app.runtime>
-        <releaseChannel>LTS</releaseChannel>
+        <app.runtime>4.13.2:7e</app.runtime>
         <javaVersion>17</javaVersion>
         <mule.maven.plugin.version>4.10.1</mule.maven.plugin.version>
         <munit.version>3.7.3</munit.version>
@@ -24,7 +23,7 @@
         <repository>
             <id>anypoint-exchange-v3</id>
             <name>Anypoint Exchange</name>
-            <url>https://maven.anypoint.mulesoft.com/api/v3/organizations/2b624f3c-bc06-4d04-90ef-48200b112b5d/maven</url>
+            <url>https://maven.anypoint.mulesoft.com/api/v3/organizations/49a5c82f-4354-4c4d-934f-9e50875ad682/maven</url>
             <layout>default</layout>
         </repository>
     </distributionManagement>
@@ -81,6 +80,7 @@
 
     <build>
         <plugins>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-clean-plugin</artifactId>
@@ -95,19 +95,26 @@
 
                 <configuration>
                     <cloudhub2Deployment>
+
                         <uri>https://anypoint.mulesoft.com</uri>
+
+                        <connectedAppClientId>${env.ANYPOINT_CLIENT_ID}</connectedAppClientId>
+                        <connectedAppClientSecret>${env.ANYPOINT_CLIENT_SECRET}</connectedAppClientSecret>
+                        <connectedAppGrantType>client_credentials</connectedAppGrantType>
+
                         <provider>MC</provider>
                         <environment>Sandbox</environment>
+                        <businessGroupId>49a5c82f-4354-4c4d-934f-9e50875ad682</businessGroupId>
                         <target>Cloudhub-US-East-2</target>
+
                         <applicationName>travel-agency-process-api-v2</applicationName>
+
                         <replicas>1</replicas>
                         <vCores>0.1</vCores>
 
-                        <deploymentSettings>
-                            <runtimeVersion>${app.runtime}</runtimeVersion>
-                            <releaseChannel>${releaseChannel}</releaseChannel>
-                            <javaVersion>${javaVersion}</javaVersion>
-                        </deploymentSettings>
+                        <muleVersion>${app.runtime}</muleVersion>
+                        <releaseChannel>EDGE</releaseChannel>
+                        <javaVersion>17</javaVersion>
 
                         <properties>
                             <property>
@@ -117,6 +124,7 @@
                         </properties>
 
                         <skipDeploymentVerification>false</skipDeploymentVerification>
+
                     </cloudhub2Deployment>
                 </configuration>
             </plugin>
@@ -135,7 +143,9 @@
                     </execution>
                 </executions>
             </plugin>
+
         </plugins>
     </build>
 
 </project>
+
